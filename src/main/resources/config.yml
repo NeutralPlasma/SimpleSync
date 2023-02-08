@@ -1,0 +1,21 @@
+bot_token: "" # GET THIS ON DISCORD DEVELOPERS PAGE
+guild_id: 930296976606629918 # ID OF THE GUILD
+language: "en" # DEFAULT EN
+synced_role: 1071922010457911316 # ROLE APPLIED WHEN USER SYNCES ACC
+
+mysql:
+  address: "127.0.0.1"
+  port: 3306
+  username: "root"
+  password: "securepassword"
+  useSSL: false
+  database: ""
+  table_prefix: ""
+  maxPoolSize: 10
+  connectionTimeOut: 10000
+
+ranks: # ROLES FOR RANKS
+  Admin: # NAME OF RANK
+    discord_role_id: 946110127772172338 # ID OF ROLE ON DISCORD
+  Vip:
+    discord_role_id: 1061594473290809375

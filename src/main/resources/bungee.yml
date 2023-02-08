@@ -1,0 +1,8 @@
+name: SimpleSync
+version: '${version}'
+main: eu.virtusdevelops.simplesync.SimpleSync
+description: Sync your server ranks with discord!
+author: NeutralPlasma
+
+depends:
+  - LuckPerms
