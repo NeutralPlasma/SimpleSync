@@ -39,7 +39,7 @@ public class DiscordBot {
 
             slashCommandListener.registerCommand(new SyncCommand("sync", simpleSync.getLinkedPlayerRepository()));
             slashCommandListener.registerCommand(new LinkCodeCommand("linkcode", simpleSync.getLinkedPlayerRepository(), simpleSync.getLinkCodeRepository()));
-            slashCommandListener.registerCommand(new RewardClaimCommand("rewardclaim", simpleSync.getLinkedPlayerRepository()));
+            slashCommandListener.registerCommand(new RewardClaimCommand("rewardclaim", simpleSync.getLinkedPlayerRepository(), simpleSync));
 
         }catch (Exception e){
           throw new RuntimeException(e);

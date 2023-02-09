@@ -23,9 +23,12 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -182,5 +185,14 @@ public final class SimpleSync extends Plugin {
         discordBot.syncRoles(linkedPlayer.getDiscordUser(), toAdd, getAllRoles());
         if(updateName)
             discordBot.updateName(linkedPlayer.getDiscordUser(), name);
+    }
+
+
+
+    public BufferedImage getTemplate() throws IOException {
+        URL url = new URL("https://cdn.discordapp.com/attachments/946110130997563427/1073249740604588062/PVP_stats.png");
+        return ImageIO.read(url);
+
+
     }
 }

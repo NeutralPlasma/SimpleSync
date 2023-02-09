@@ -10,7 +10,7 @@ mysql:
   password: "securepassword"
   useSSL: false
   database: ""
-  table_prefix: ""
+  table_prefix: "simplesync_"
   maxPoolSize: 10
   connectionTimeOut: 10000
 
@@ -19,3 +19,22 @@ ranks: # ROLES FOR RANKS
     discord_role_id: 946110127772172338 # ID OF ROLE ON DISCORD
   Vip:
     discord_role_id: 1061594473290809375
+
+
+
+#
+# TODO
+#
+server_statistics:
+  enabled: false
+
+  servers:
+    survival:
+      database_table_name: "" # how did you name table in syncing plugin.
+      display_name: "Survival" # how do you wish servers name to be displayed on image
+
+      tracking_data:
+        "%player_kills%": # placeholder
+          type: number
+        "%player_deaths%":
+          type: number
