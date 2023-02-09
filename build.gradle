@@ -59,4 +59,6 @@ processResources {
 
 
 shadowJar {
+    relocate 'org.mariadb.jdbc', 'eu.virtusdevelops.simplesync.lib.mariadb'
+    relocate 'com.zaxxer.hikari', 'eu.virtusdevelops.simplesync.lib.hikari'
 }

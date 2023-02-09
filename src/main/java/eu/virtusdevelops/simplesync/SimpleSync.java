@@ -1,8 +1,10 @@
 package eu.virtusdevelops.simplesync;
 
+import com.zaxxer.hikari.HikariDataSource;
 import eu.virtusdevelops.simplesync.bot.DiscordBot;
 import eu.virtusdevelops.simplesync.commands.LinkCommand;
 import eu.virtusdevelops.simplesync.commands.UnLinkCommand;
+import eu.virtusdevelops.simplesync.db.ConnectionManager;
 import eu.virtusdevelops.simplesync.db.entity.LinkedPlayer;
 import eu.virtusdevelops.simplesync.listeners.PlayerJoinListener;
 import eu.virtusdevelops.simplesync.db.repositories.LinkedPlayerRepository;
@@ -11,12 +13,10 @@ import eu.virtusdevelops.simplesync.managers.LanguageManager;
 import eu.virtusdevelops.simplesync.models.BasicProperties;
 import eu.virtusdevelops.simplesync.models.Properties;
 import eu.virtusdevelops.simplesync.db.repositories.LinkCodeRepository;
-import io.netty.handler.codec.base64.Base64;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -39,7 +39,7 @@ public final class SimpleSync extends Plugin {
     private LinkedPlayerRepository linkedPlayerRepository;
 
     private List<Long> allRoles = new ArrayList<>();
-
+    private HikariDataSource hikariDataSource;
 
 
     @Override
@@ -48,12 +48,14 @@ public final class SimpleSync extends Plugin {
 
 
         Properties<BasicProperties> mysqlSettings = getMysqlSettings();
+        hikariDataSource = ConnectionManager.openConnecton(mysqlSettings);
+
 
         /*
             SETUP ALL REPOSITORIES
          */
-        linkCodeRepository = new LinkCodeRepository(mysqlSettings, mysqlSettings.getString("table_prefix"));
-        linkedPlayerRepository = new LinkedPlayerRepository(mysqlSettings, mysqlSettings.getString("table_prefix"));
+        linkCodeRepository = new LinkCodeRepository(mysqlSettings, hikariDataSource);
+        linkedPlayerRepository = new LinkedPlayerRepository(mysqlSettings, hikariDataSource);
         new LanguageManager(this, getConfig().getString("language"));
 
 

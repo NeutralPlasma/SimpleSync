@@ -13,8 +13,9 @@ import java.util.*;
 public abstract class Repository<T, K> {
 
 
-	public Repository(Properties<BasicProperties> properties, String prefix){
-		hikari = openConnecton(properties);
+	public Repository(Properties<BasicProperties> properties, HikariDataSource dataSource){
+		//hikari = openConnecton(properties);
+		this.hikari = dataSource;
 		create(properties.getString("table_prefix"));
 	}
 
@@ -35,22 +36,5 @@ public abstract class Repository<T, K> {
 	}
 
 
-
-
-	private HikariDataSource openConnecton(Properties<BasicProperties> properties) {
-		HikariConfig config = new HikariConfig();
-		config.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
-		config.setPoolName("RepositoryPool");
-		config.setMaximumPoolSize(properties.getInt("maxPoolSize"));
-		config.setConnectionTimeout(properties.getInt("connectionTimeOut"));
-		config.addDataSourceProperty("serverName", properties.getString("address"));
-		config.addDataSourceProperty("port", properties.getInt("port"));
-		config.addDataSourceProperty("databaseName", properties.getString("database"));
-		config.addDataSourceProperty("user", properties.getString("username"));
-		config.addDataSourceProperty("password", properties.getString("password"));
-		config.addDataSourceProperty("useSSL", properties.getBoolean("useSSL"));
-
-		return new HikariDataSource(config);
-	}
 
 }

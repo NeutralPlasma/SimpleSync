@@ -1,5 +1,6 @@
 package eu.virtusdevelops.simplesync.bot.listeners;
 
+import eu.virtusdevelops.simplesync.bot.commands.SlashCommand;
 import eu.virtusdevelops.simplesync.db.entity.LinkCode;
 import eu.virtusdevelops.simplesync.db.entity.LinkedPlayer;
 import eu.virtusdevelops.simplesync.db.repositories.LinkCodeRepository;
@@ -7,81 +8,35 @@ import eu.virtusdevelops.simplesync.db.repositories.LinkedPlayerRepository;
 import eu.virtusdevelops.simplesync.utils.CodeUtil;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class SlashCommandListener extends ListenerAdapter {
-    private LinkCodeRepository linkCodeRepository;
-    private LinkedPlayerRepository linkedPlayerRepository;
+
+    List<SlashCommand> slashCommandList = new ArrayList<>();
 
 
-    public SlashCommandListener(LinkCodeRepository linkCodeRepository, LinkedPlayerRepository linkedPlayerRepository){
-        this.linkCodeRepository = linkCodeRepository;
-        this.linkedPlayerRepository = linkedPlayerRepository;
+    public SlashCommandListener(){
     }
 
 
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-
-        if(event.getName().equals("sync")){
-            event.deferReply().queue();
-            // DO THE SYNCING
-            Optional<LinkedPlayer> linkedPlayer = linkedPlayerRepository.findByDiscordUser(event.getUser().getIdLong());
-            if(linkedPlayer.isPresent()){
-                event.getHook().sendMessage("Already linked: " + linkedPlayer.get().getUsername())
-                        .setEphemeral(true).queue((result) -> {
-                            result.delete().queueAfter(5, TimeUnit.SECONDS);
-                        });
-
-            }else{
-                event.getHook().sendMessage("You don't have any account linked.")
-                        .setEphemeral(true).queue((result) -> {
-                            result.delete().queueAfter(5, TimeUnit.SECONDS);
-                        });
+        for(SlashCommand slashCommand: slashCommandList){
+            if(slashCommand.getName().equals(event.getName())){
+                slashCommand.execute(event);
             }
         }
+    }
 
-        if(event.getName().equals("linkcode")){
-            // do the sync command
-            event.deferReply().queue();
-
-            Optional<LinkCode> code = linkCodeRepository.findByDiscordUser(event.getUser().getIdLong());
-            if(code.isPresent()){
-                if(code.get().isExpired()){
-                    linkCodeRepository.delete(code.get());
-                    LinkCode code1  = new LinkCode(event.getUser().getIdLong(), CodeUtil.randomCode());
-                    linkCodeRepository.save(code1);
-                    event.getHook().sendMessage("Your code has been generated, sending it now...").setEphemeral(true).queue((result) -> {
-                        result.delete().queueAfter(5, TimeUnit.SECONDS);
-                    });
-                    event.getHook().sendMessage("Here's your code: `" + code1.getCode() + "`")
-                            .setEphemeral(true).queue();
-                }else{
-                    event.getHook().sendMessage("Your code has been generated, sending it now...").setEphemeral(true).queue((result) -> {
-                        result.delete().queueAfter(5, TimeUnit.SECONDS);
-                    });
-                    event.getHook().sendMessage("Here's your code: `" + code.get().getCode() + "`")
-                            .setEphemeral(true).queue();
-                }
-            }else{
-                String codeString = CodeUtil.randomCode();
-                LinkCode code1  = new LinkCode(event.getUser().getIdLong(), codeString);
-                linkCodeRepository.save(code1);
-
-                event.getHook().sendMessage("Your code has been generated, sending it now...").setEphemeral(true).queue((result) -> {
-                    result.delete().queueAfter(5, TimeUnit.SECONDS);
-                });
-                event.getHook().sendMessage("Here's your code: `" + code1.getCode() + "`")
-                        .setEphemeral(true).queue();
-            }
-
-
-        }
-
-        super.onSlashCommandInteraction(event);
+    public void registerCommand(SlashCommand slashCommand){
+        slashCommandList.add(slashCommand);
     }
 }

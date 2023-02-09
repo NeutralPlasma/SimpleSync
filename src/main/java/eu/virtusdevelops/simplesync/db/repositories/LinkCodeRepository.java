@@ -1,5 +1,6 @@
 package eu.virtusdevelops.simplesync.db.repositories;
 
+import com.zaxxer.hikari.HikariDataSource;
 import eu.virtusdevelops.simplesync.db.entity.LinkCode;
 import eu.virtusdevelops.simplesync.models.BasicProperties;
 import eu.virtusdevelops.simplesync.models.Properties;
@@ -16,8 +17,8 @@ public class LinkCodeRepository extends Repository<LinkCode, Long> {
 
     String prefix;
 
-     public LinkCodeRepository(Properties<BasicProperties> properties, String prefix) {
-         super(properties, prefix);
+     public LinkCodeRepository(Properties<BasicProperties> properties, HikariDataSource hikariDataSource) {
+         super(properties, hikariDataSource);
          this.prefix = properties.getString("table_prefix");
     }
 

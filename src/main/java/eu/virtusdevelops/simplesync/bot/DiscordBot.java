@@ -1,6 +1,9 @@
 package eu.virtusdevelops.simplesync.bot;
 
 import eu.virtusdevelops.simplesync.SimpleSync;
+import eu.virtusdevelops.simplesync.bot.commands.LinkCodeCommand;
+import eu.virtusdevelops.simplesync.bot.commands.RewardClaimCommand;
+import eu.virtusdevelops.simplesync.bot.commands.SyncCommand;
 import eu.virtusdevelops.simplesync.bot.listeners.SlashCommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -10,9 +13,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.List;
 
@@ -22,6 +22,7 @@ public class DiscordBot {
     private Properties properties;
     private Guild guild;
     private SimpleSync simpleSync;
+    private SlashCommandListener slashCommandListener;
 
 
     public DiscordBot(Properties properties, SimpleSync simpleSync){
@@ -30,12 +31,16 @@ public class DiscordBot {
         this.simpleSync = simpleSync;
 
         try{
+
+            slashCommandListener = new SlashCommandListener();
             this.jda = JDABuilder.createDefault(properties.getString("token"))
-                    .addEventListeners(new SlashCommandListener(
-                            simpleSync.getLinkCodeRepository(),
-                            simpleSync.getLinkedPlayerRepository()
-                    ))
+                    .addEventListeners(slashCommandListener)
                     .build().awaitReady();
+
+            slashCommandListener.registerCommand(new SyncCommand("sync", simpleSync.getLinkedPlayerRepository()));
+            slashCommandListener.registerCommand(new LinkCodeCommand("linkcode", simpleSync.getLinkedPlayerRepository(), simpleSync.getLinkCodeRepository()));
+            slashCommandListener.registerCommand(new RewardClaimCommand("rewardclaim", simpleSync.getLinkedPlayerRepository()));
+
         }catch (Exception e){
           throw new RuntimeException(e);
         }
@@ -48,7 +53,8 @@ public class DiscordBot {
         if(this.guild != null){
             guild.updateCommands().addCommands(
                     Commands.slash("linkcode", "Generates unique code for you to link your account."),
-                    Commands.slash("sync", "Forcefully syncs your rank."))
+                    Commands.slash("sync", "Forcefully syncs your rank."),
+                    Commands.slash("rewardclaim", "Forcefully syncs your rank."))
                     .queue();
 
         }else{
